@@ -65,17 +65,21 @@ CONFIG = {
     },
 
     # Sector correlation groups — no two stocks from same group
-    # Edit to control portfolio diversification
+    # Finnhub uses broad industry names — mapped accordingly
     "correlation_groups": {
-        "US_BANKS":        ["Banks", "Credit Services", "Insurance"],
-        "ENERGY":          ["Oil & Gas", "Energy"],
-        "CONSUMER_STAPLES":["Packaged Foods", "Beverages", "Household Products", "Tobacco"],
-        "PHARMA":          ["Drug Manufacturers", "Biotechnology", "Diagnostics & Research"],
-        "TECH_PLATFORM":   ["Software", "Internet Content", "Information Technology Services"],
-        "INDUSTRIAL":      ["Aerospace & Defense", "Industrial Distribution", "Specialty Chemicals"],
-        "REAL_ESTATE":     ["Real Estate", "REITs"],
-        "DEFENSE":         ["Aerospace & Defense"],
-        "MEDIA":           ["Entertainment", "Publishing"],
+        "FINANCE":         ["Banks", "Insurance", "Financial", "Credit", "Asset Management",
+                           "Capital Markets", "Diversified Financial"],
+        "ENERGY":          ["Oil", "Gas", "Energy", "Petroleum", "Utilities"],
+        "CONSUMER":        ["Food", "Beverage", "Tobacco", "Household", "Personal", "Retail",
+                           "Consumer", "Apparel", "Textile"],
+        "HEALTHCARE":      ["Drug", "Pharma", "Biotech", "Medical", "Health", "Diagnostic",
+                           "Life Science", "Surgical"],
+        "TECH":            ["Software", "Technology", "Semiconductor", "Internet", "Computer",
+                           "Electronic", "IT Services", "Communication"],
+        "INDUSTRIAL":      ["Aerospace", "Defense", "Machinery", "Industrial", "Chemical",
+                           "Construction", "Engineering", "Manufacturing"],
+        "REAL_ESTATE":     ["Real Estate", "REIT", "Property"],
+        "MATERIALS":       ["Mining", "Metal", "Steel", "Material", "Paper", "Packaging"],
     },
 
     # Universe of stocks to scan
@@ -555,7 +559,7 @@ class ValueScanner:
             m = self.data_provider.get_metrics(ticker)
             if m:
                 all_metrics.append(m)
-            time.sleep(0.3)  # Rate limit respect
+            time.sleep(1.5)  # Finnhub free tier: 60 calls/min, 3 endpoints per ticker = ~20 tickers/min
 
         print(f"\n✓ Fetched {len(all_metrics)} stocks")
 
