@@ -24,7 +24,7 @@ import urllib.parse
 
 CONFIG = {
     # API keys — set via environment variables
-    "FMP_API_KEY": os.getenv("FMP_API_KEY", "demo"),          # Financial Modeling Prep
+    "FMP_API_KEY": os.getenv("FMP_API_KEY", "demo"), "FINNHUB_API_KEY": os.getenv("FINNHUB_API_KEY", ""),         # Financial Modeling Prep
     "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY", ""),  # Claude rationale
 
     # Value framework thresholds (Graham / Greenblatt / Lynch / Buffett)
@@ -527,7 +527,10 @@ class ValueScanner:
 
     def __init__(self, config: dict = CONFIG):
         self.config = config
-        self.data_provider = USDataProvider(config["FMP_API_KEY"])
+        self.data_provider =import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+from data_provider_finnhub import FinnhubDataProvider
+self.data_provider = FinnhubDataProvider(os.getenv("FINNHUB_API_KEY", ""))
         self.scorer = ValueScoringEngine(config)
         self.rationale_engine = RationaleEngine(config["ANTHROPIC_API_KEY"])
 
