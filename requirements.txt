@@ -1,0 +1,3 @@
+# ValueScan dependencies
+# All stdlib — no external packages needed
+# Python 3.8+ required
