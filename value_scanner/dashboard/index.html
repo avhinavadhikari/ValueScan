@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ValueScan — US Value Stock Scanner</title>
+<style>
+  :root {
+    --bg:       #0E1117;
+    --surface:  #161B25;
+    --card:     #1C2333;
+    --border:   #252D3D;
+    --border2:  #2E3A50;
+    --text:     #E2E8F4;
+    --muted:    #8896B0;
+    --dim:      #4A5568;
+    --green:    #22C97A;
+    --green-bg: #0D2A1C;
+    --amber:    #F5A623;
+    --amber-bg: #2A1D06;
+    --red:      #E05252;
+    --red-bg:   #2A0D0D;
+    --blue:     #4A9EFF;
+    --blue-bg:  #0D1E38;
+    --purple:   #9B8EFF;
+    --accent:   #22C97A;
+    --mono:     'SF Mono', 'Fira Code', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--text);
+  }
+  .logo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .scan-badge {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── Layout ── */
+  .main { max-width: 1280px; margin: 0 auto; padding: 28px 28px 60px; }
+
+  /* ── Stats row ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+  .stat-val { font-size: 22px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+  .stat-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+  .sort-select {
+    margin-left: auto;
+    background: var(--card);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* ── Table ── */
+  .table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--card); margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+  }
+  thead th:hover { color: var(--text); }
+  thead th.sorted { color: var(--accent); }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,.025); }
+  tbody tr.expanded { background: rgba(34,201,122,.04); }
+  td { padding: 12px 14px; vertical-align: top; }
+
+  .ticker-cell { display: flex; flex-direction: column; gap: 2px; }
+  .ticker-sym { font-size: 14px; font-weight: 600; color: var(--text); font-family: var(--mono); }
+  .ticker-name { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
+
+  .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .score-num { font-size: 14px; font-weight: 600; font-family: var(--mono); min-width: 36px; }
+  .score-bar-bg { width: 60px; height: 4px; border-radius: 2px; background: var(--border2); }
+  .score-bar { height: 4px; border-radius: 2px; }
+
+  .moat-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 10px;
+    text-transform: capitalize;
+  }
+  .moat-high   { background: var(--green-bg); color: var(--green); border: 1px solid #1a5e38; }
+  .moat-medium { background: var(--amber-bg); color: var(--amber); border: 1px solid #5e3a0d; }
+  .moat-low    { background: var(--red-bg);   color: var(--red);   border: 1px solid #5e1d1d; }
+  .moat-unknown{ background: var(--card); color: var(--dim); border: 1px solid var(--border); }
+
+  .metric-val { font-size: 13px; font-family: var(--mono); color: var(--text); }
+  .metric-na  { font-size: 12px; color: var(--dim); }
+
+  .mos-val { font-family: var(--mono); font-size: 13px; }
+  .mos-high { color: var(--green); }
+  .mos-med  { color: var(--amber); }
+  .mos-low  { color: var(--muted); }
+
+  /* ── Expanded row detail ── */
+  .detail-row td { padding: 0; background: var(--surface); }
+  .detail-inner {
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    border-top: 1px solid rgba(34,201,122,.15);
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-section { }
+  .detail-section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .detail-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .dm { }
+  .dm-label { font-size: 10px; color: var(--dim); }
+  .dm-val { font-size: 13px; font-family: var(--mono); color: var(--text); }
+  .rationale-text { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .rationale-text strong { color: var(--text); font-weight: 500; }
+
+  .tag-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+  .tag { font-size: 10px; padding: 2px 7px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border2); color: var(--muted); }
+
+  /* ── Framework legend ── */
+  .legend {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .legend-item { }
+  .legend-title { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .legend-desc  { font-size: 11px; color: var(--dim); line-height: 1.5; }
+
+  /* ── Footer bar ── */
+  .footer-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 10px 28px;
+    font-size: 11px;
+    color: var(--dim);
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+  }
+
+  .section-head { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    ValueScan
+  </div>
+  <div class="header-right">
+    <div class="scan-badge">
+      <div class="live-dot"></div>
+      <span id="scan-date">Loading...</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- Stats row -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-label">Universe scanned</div><div class="stat-val" id="s-universe">—</div><div class="stat-sub">US tickers</div></div>
+    <div class="stat-card"><div class="stat-label">Passed filters</div><div class="stat-val" id="s-qualified">—</div><div class="stat-sub">value framework</div></div>
+    <div class="stat-card"><div class="stat-label">After correlation</div><div class="stat-val" id="s-corr">—</div><div class="stat-sub">diversified picks</div></div>
+    <div class="stat-card"><div class="stat-label">Top picks</div><div class="stat-val" id="s-top">—</div><div class="stat-sub">in watchlist</div></div>
+    <div class="stat-card"><div class="stat-label">Avg value score</div><div class="stat-val" id="s-avg">—</div><div class="stat-sub">out of 100</div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="filter-btn active" onclick="filterMoat('all', this)">All moats</button>
+    <button class="filter-btn" onclick="filterMoat('high', this)">Wide moat</button>
+    <button class="filter-btn" onclick="filterMoat('medium', this)">Narrow moat</button>
+    <button class="filter-btn" onclick="filterSector('Consumer', this)">Consumer</button>
+    <button class="filter-btn" onclick="filterSector('Healthcare', this)">Healthcare</button>
+    <button class="filter-btn" onclick="filterSector('Industrial', this)">Industrial</button>
+    <button class="filter-btn" onclick="filterSector('Financial', this)">Finance</button>
+    <select class="sort-select" onchange="sortBy(this.value)">
+      <option value="value_score">Sort: Value score</option>
+      <option value="margin_of_safety">Sort: Margin of safety</option>
+      <option value="pe">Sort: P/E low→high</option>
+      <option value="fcf_yield">Sort: FCF yield</option>
+      <option value="dividend_yield">Sort: Dividend yield</option>
+    </select>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th style="min-width:150px">Stock</th>
+          <th>Score</th>
+          <th>Moat</th>
+          <th>P/E</th>
+          <th>FCF yield</th>
+          <th>Div yield</th>
+          <th>MoS%</th>
+          <th>Sector</th>
+          <th>Mkt cap</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- Legend -->
+  <div class="section-head">How the framework scores stocks</div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-title">Graham filter (pass/fail)</div>
+      <div class="legend-desc">P/E &lt; 20 · P/B &lt; 3 · Debt/equity &lt; 1.5 · Current ratio &gt; 1.2 · Market cap $0.5B–$100B</div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-title">Value score (0–100)</div>
+      <div class="legend-desc">P/E quality (25pts) · FCF yield (20pts) · ROE (20pts) · P/B (10pts) · Dividend (10pts) · Moat bonus (10pts)</div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-title">Moat assessment</div>
+      <div class="legend-desc">Wide = software, tobacco, ratings agencies, diagnostics. Narrow = distribution, specialty chemicals, insurance.</div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-title">Correlation filter</div>
+      <div class="legend-desc">Max 2 stocks per sector group. Ensures no two picks move together in a downturn — portfolio diversification by design.</div>
+    </div>
+  </div>
+
+</main>
+
+<div class="footer-bar">
+  ValueScan is for educational purposes only. Not personalised investment advice. Always do your own research. · Built on Graham · Fisher · Buffett · Lynch · Klarman · Greenblatt
+</div>
+
+<script>
+let allStocks = [];
+let currentFilter = { moat: 'all', sector: null };
+let currentSort = 'value_score';
+let expandedRow = null;
+
+async function loadData() {
+  const res = await fetch('../output/scan_US_2026-07-28.json');
+  const data = await res.json();
+
+  // Stats
+  document.getElementById('scan-date').textContent = 'Scan: ' + data.scan_date;
+  document.getElementById('s-universe').textContent = data.universe_size;
+  document.getElementById('s-qualified').textContent = data.stocks_qualified;
+  document.getElementById('s-corr').textContent = data.stocks_after_correlation;
+  document.getElementById('s-top').textContent = data.top_picks.length;
+  const avg = data.top_picks.reduce((a,s) => a + s.value_score, 0) / data.top_picks.length;
+  document.getElementById('s-avg').textContent = avg.toFixed(1);
+
+  allStocks = data.top_picks;
+  render();
+}
+
+function render() {
+  let stocks = [...allStocks];
+
+  if (currentFilter.moat !== 'all') stocks = stocks.filter(s => s.moat_score === currentFilter.moat);
+  if (currentFilter.sector) stocks = stocks.filter(s => s.metrics.sector.includes(currentFilter.sector));
+
+  stocks.sort((a, b) => {
+    if (currentSort === 'value_score')     return b.value_score - a.value_score;
+    if (currentSort === 'margin_of_safety')return b.margin_of_safety - a.margin_of_safety;
+    if (currentSort === 'pe')              return (a.metrics.pe_ratio||999) - (b.metrics.pe_ratio||999);
+    if (currentSort === 'fcf_yield')       return (b.metrics.fcf_yield||0) - (a.metrics.fcf_yield||0);
+    if (currentSort === 'dividend_yield')  return (b.metrics.dividend_yield||0) - (a.metrics.dividend_yield||0);
+    return 0;
+  });
+
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+
+  stocks.forEach((s, i) => {
+    const m = s.metrics;
+    const scoreColor = s.value_score >= 70 ? '#22C97A' : s.value_score >= 55 ? '#F5A623' : '#8896B0';
+    const mosClass   = s.margin_of_safety >= 25 ? 'mos-high' : s.margin_of_safety >= 12 ? 'mos-med' : 'mos-low';
+    const moatClass  = `moat-${s.moat_score}`;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td style="color:var(--dim);font-size:12px">${i+1}</td>
+      <td>
+        <div class="ticker-cell">
+          <span class="ticker-sym">${m.ticker}</span>
+          <span class="ticker-name" title="${m.company}">${m.company}</span>
+        </div>
+      </td>
+      <td>
+        <div class="score-bar-wrap">
+          <span class="score-num" style="color:${scoreColor}">${s.value_score}</span>
+          <div class="score-bar-bg"><div class="score-bar" style="width:${s.value_score}%;background:${scoreColor}"></div></div>
+        </div>
+      </td>
+      <td><span class="moat-pill ${moatClass}">${s.moat_score}</span></td>
+      <td>${m.pe_ratio ? `<span class="metric-val">${m.pe_ratio}x</span>` : '<span class="metric-na">—</span>'}</td>
+      <td>${m.fcf_yield ? `<span class="metric-val">${m.fcf_yield}%</span>` : '<span class="metric-na">—</span>'}</td>
+      <td>${m.dividend_yield ? `<span class="metric-val" style="color:var(--green)">${m.dividend_yield}%</span>` : '<span class="metric-na">—</span>'}</td>
+      <td><span class="mos-val ${mosClass}">${s.margin_of_safety}%</span></td>
+      <td style="font-size:12px;color:var(--muted)">${m.sector}</td>
+      <td style="font-size:12px;font-family:var(--mono);color:var(--muted)">$${m.market_cap_b}B</td>
+    `;
+
+    row.onclick = () => toggleDetail(row, s, i);
+    tbody.appendChild(row);
+
+    // Detail row (hidden by default)
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'detail-row';
+    detailRow.id = `detail-${i}`;
+    detailRow.style.display = 'none';
+    detailRow.innerHTML = `
+      <td colspan="10">
+        <div class="detail-inner">
+          <div class="detail-section">
+            <div class="detail-section-title">All metrics</div>
+            <div class="detail-metrics">
+              <div class="dm"><div class="dm-label">P/E ratio</div><div class="dm-val">${m.pe_ratio ?? '—'}x</div></div>
+              <div class="dm"><div class="dm-label">P/B ratio</div><div class="dm-val">${m.pb_ratio ?? '—'}x</div></div>
+              <div class="dm"><div class="dm-label">ROE</div><div class="dm-val">${m.roe ?? '—'}%</div></div>
+              <div class="dm"><div class="dm-label">FCF yield</div><div class="dm-val">${m.fcf_yield ?? '—'}%</div></div>
+              <div class="dm"><div class="dm-label">Debt/equity</div><div class="dm-val">${m.debt_equity ?? '—'}</div></div>
+              <div class="dm"><div class="dm-label">Current ratio</div><div class="dm-val">${m.current_ratio ?? '—'}</div></div>
+              <div class="dm"><div class="dm-label">Rev growth</div><div class="dm-val">${m.revenue_growth ?? '—'}%</div></div>
+              <div class="dm"><div class="dm-label">Gross margin</div><div class="dm-val">${m.gross_margin ?? '—'}%</div></div>
+              <div class="dm"><div class="dm-label">Div yield</div><div class="dm-val">${m.dividend_yield ?? '—'}%</div></div>
+              <div class="dm"><div class="dm-label">52w low</div><div class="dm-val">$${m.fifty_two_week_low ?? '—'}</div></div>
+              <div class="dm"><div class="dm-label">52w high</div><div class="dm-val">$${m.fifty_two_week_high ?? '—'}</div></div>
+              <div class="dm"><div class="dm-label">Price</div><div class="dm-val">$${m.price}</div></div>
+            </div>
+            <div class="tag-row">
+              <span class="tag">${s.correlation_group}</span>
+              <span class="tag">${m.industry}</span>
+              <span class="tag">MoS ${s.margin_of_safety}%</span>
+            </div>
+          </div>
+          <div class="detail-section" style="grid-column: span 2">
+            <div class="detail-section-title">AI investment rationale</div>
+            <div class="rationale-text">${s.rationale}</div>
+          </div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(detailRow);
+  });
+}
+
+function toggleDetail(row, s, i) {
+  const detailRow = document.getElementById(`detail-${i}`);
+  const isOpen = detailRow.style.display !== 'none';
+  // Close any open
+  document.querySelectorAll('.detail-row').forEach(r => r.style.display = 'none');
+  document.querySelectorAll('tbody tr:not(.detail-row)').forEach(r => r.classList.remove('expanded'));
+  if (!isOpen) {
+    detailRow.style.display = '';
+    row.classList.add('expanded');
+  }
+}
+
+function filterMoat(moat, btn) {
+  currentFilter.moat = moat;
+  currentFilter.sector = null;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function filterSector(sector, btn) {
+  currentFilter.sector = currentFilter.sector === sector ? null : sector;
+  currentFilter.moat = 'all';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (currentFilter.sector) btn.classList.add('active');
+  else document.querySelector('.filter-btn').classList.add('active');
+  render();
+}
+
+function sortBy(val) { currentSort = val; render(); }
+
+loadData();
+</script>
+</body>
+</html>

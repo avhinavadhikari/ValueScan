@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Scanner — ValueScan Pro</title>
+<meta name="description" content="Enter any stock ticker and get an instant value analysis using the Graham-Buffett-Munger framework.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --forest:  #1A2E1A; --forest2: #213521; --card: #1E3120; --card2: #243828;
+  --border:  #2E4A30; --border2: #3A5C3A;
+  --cream:   #F2ECD8; --cream2: #E8DFC4; --muted: #8FA882; --dim: #4A6B4A;
+  --gold:    #D4A83A; --gold2: #C49628; --gold-bg: rgba(212,168,58,.1);
+  --amber:   #E8B84A; --red: #C45C4A; --green-pass: #5DB87A;
+  --serif: 'Crimson Pro',Georgia,serif;
+  --sans:  'Inter',system-ui,sans-serif;
+  --mono:  'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--forest);color:var(--cream);font-size:15px;line-height:1.6;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:linear-gradient(160deg,#1C321C 0%,#162816 50%,#111E11 100%);z-index:-1;}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 44px;border-bottom:1px solid var(--border);background:rgba(26,46,26,.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:var(--serif);font-size:42px;font-weight:600;color:var(--cream);text-decoration:none;display:flex;align-items:center;gap:11px;letter-spacing:-.015em;line-height:1;}
+.logo-mark{width:8px;height:8px;background:var(--gold);border-radius:50%;}
+.nav-links{display:flex;align-items:center;gap:22px;}
+.nav-links a{color:var(--muted);font-size:13px;text-decoration:none;transition:color .15s;}
+.nav-links a:hover{color:var(--cream);}
+.nav-badge{background:var(--gold-bg);border:1px solid rgba(212,168,58,.3);color:var(--gold);font-size:11px;font-weight:500;padding:4px 10px;border-radius:10px;}
+
+.container{max-width:860px;margin:0 auto;padding:52px 44px 80px;}
+
+.page-eyebrow{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;}
+.page-h1{font-family:var(--serif);font-size:clamp(32px,5vw,52px);font-weight:600;line-height:1.1;margin-bottom:10px;}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:36px;line-height:1.65;max-width:560px;}
+
+/* SEARCH BOX */
+.search-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:28px;}
+.search-label{font-size:13px;color:var(--muted);margin-bottom:10px;}
+.search-row{display:flex;gap:10px;}
+.search-input{
+  flex:1;background:rgba(0,0,0,.3);border:1px solid var(--border2);
+  color:var(--cream);padding:14px 18px;border-radius:9px;
+  font-size:18px;font-family:var(--mono);font-weight:500;
+  outline:none;transition:border-color .15s;text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.search-input::placeholder{color:var(--dim);font-size:15px;letter-spacing:.02em;text-transform:none;font-weight:400;}
+.search-input:focus{border-color:var(--gold);}
+.search-btn{
+  background:var(--gold);color:#111;font-weight:500;font-size:15px;
+  padding:14px 28px;border-radius:9px;border:none;cursor:pointer;
+  font-family:var(--sans);white-space:nowrap;transition:background .15s;
+  min-width:160px;
+}
+.search-btn:hover{background:var(--gold2);}
+.search-btn:disabled{background:var(--dim);color:var(--muted);cursor:not-allowed;}
+.search-note{font-size:11px;color:var(--dim);margin-top:10px;}
+
+/* QUICK TICKERS */
+.quick-label{font-size:11px;color:var(--dim);margin-bottom:8px;margin-top:16px;}
+.quick-tickers{display:flex;gap:6px;flex-wrap:wrap;}
+.quick-chip{
+  font-family:var(--mono);font-size:11px;padding:4px 10px;
+  border:1px solid var(--border2);border-radius:6px;color:var(--muted);
+  cursor:pointer;transition:all .15s;background:transparent;
+}
+.quick-chip:hover{border-color:var(--gold);color:var(--gold);}
+
+/* LOADING STATE */
+.loading-state{text-align:center;padding:48px 20px;display:none;}
+.loading-spinner{width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--muted);}
+.loading-steps{margin-top:12px;display:flex;flex-direction:column;gap:4px;}
+.loading-step{font-family:var(--mono);font-size:11px;color:var(--dim);opacity:0;transition:opacity .3s;}
+.loading-step.visible{opacity:1;}
+
+/* RESULT CARD */
+.result-card{display:none;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+
+.result-header{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.rh-left{}
+.result-ticker{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--cream);margin-bottom:3px;}
+.result-company{font-size:14px;color:var(--muted);}
+.result-sector{font-size:11px;color:var(--dim);margin-top:3px;font-family:var(--mono);}
+.rh-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;}
+.verdict-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;}
+.verdict-yes{background:rgba(93,184,122,.12);border:1px solid rgba(93,184,122,.3);color:var(--green-pass);}
+.verdict-no{background:rgba(196,92,74,.12);border:1px solid rgba(196,92,74,.3);color:var(--red);}
+.verdict-watch{background:var(--gold-bg);border:1px solid rgba(212,168,58,.3);color:var(--gold);}
+.gem-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:10px;font-size:12px;font-weight:500;background:var(--gold-bg);border:1px solid rgba(212,168,58,.2);color:var(--gold);}
+
+/* SCORES ROW */
+.scores-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border);}
+.score-cell{padding:18px 20px;border-right:1px solid var(--border);}
+.score-cell:last-child{border-right:none;}
+.score-cell-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.score-cell-val{font-size:22px;font-weight:500;font-family:var(--mono);}
+.score-cell-sub{font-size:10px;color:var(--dim);margin-top:2px;}
+
+/* CRITERIA GRID */
+.criteria-section{padding:20px 28px;border-bottom:1px solid var(--border);}
+.criteria-title{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:12px;}
+.criteria-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.criterion{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:7px;border:1px solid var(--border);}
+.crit-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.crit-pass{background:rgba(93,184,122,.15);color:var(--green-pass);}
+.crit-fail{background:rgba(196,92,74,.15);color:var(--red);}
+.crit-warn{background:var(--gold-bg);color:var(--gold);}
+.crit-label{font-size:11px;color:var(--muted);}
+.crit-val{font-size:11px;color:var(--cream);margin-left:auto;font-family:var(--mono);}
+
+/* WRITE-UP */
+.writeup-section{padding:24px 28px;border-bottom:1px solid var(--border);}
+.writeup-title{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.writeup-tag{font-size:10px;padding:2px 7px;border-radius:6px;background:var(--gold-bg);color:var(--gold);border:1px solid rgba(212,168,58,.2);}
+.writeup-body{font-family:var(--serif);font-size:16px;color:var(--cream2);line-height:1.75;}
+
+/* BULL BEAR */
+.bull-bear{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
+.bull-box{padding:20px 24px;border-right:1px solid var(--border);}
+.bear-box{padding:20px 24px;}
+.bb-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.bull-box .bb-label{color:var(--green-pass);}
+.bear-box .bb-label{color:var(--red);}
+.bb-text{font-size:13px;color:var(--muted);line-height:1.65;}
+
+/* METRICS TABLE */
+.metrics-section{padding:20px 28px;border-bottom:1px solid var(--border);}
+.metrics-title{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:12px;}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.metric-box{background:rgba(0,0,0,.2);border-radius:7px;padding:10px 12px;border:1px solid var(--border);}
+.metric-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+.metric-val{font-size:15px;font-weight:500;font-family:var(--mono);color:var(--cream);}
+.metric-na{font-size:13px;color:var(--dim);}
+
+/* VERDICT SUMMARY */
+.verdict-section{padding:20px 28px;}
+.verdict-title{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:8px;}
+.verdict-body{font-size:13px;color:var(--muted);line-height:1.65;}
+.risk-flag{margin-top:10px;padding:10px 12px;background:rgba(196,92,74,.08);border:1px solid rgba(196,92,74,.2);border-radius:7px;font-size:12px;color:var(--red);line-height:1.5;}
+
+/* ERROR STATE */
+.error-state{display:none;text-align:center;padding:40px 20px;background:var(--card);border:1px solid var(--border);border-radius:14px;}
+.error-icon{font-size:32px;margin-bottom:12px;}
+.error-title{font-size:16px;font-weight:500;color:var(--cream);margin-bottom:6px;}
+.error-sub{font-size:13px;color:var(--muted);}
+
+/* DISCLAIMER */
+.disclaimer{font-size:11px;color:var(--dim);padding:14px 18px;background:rgba(0,0,0,.15);border:1px solid var(--border);border-radius:8px;line-height:1.6;}
+.disclaimer a{color:var(--muted);}
+
+@media(max-width:700px){
+  nav{padding:14px 20px;}.nav-links{display:none;}
+  .container{padding:32px 20px 60px;}
+  .search-row{flex-direction:column;}
+  .scores-row{grid-template-columns:1fr 1fr;}
+  .score-cell:nth-child(2){border-right:none;}
+  .score-cell:nth-child(3){border-right:1px solid var(--border);}
+  .criteria-grid,.metrics-grid{grid-template-columns:1fr 1fr;}
+  .bull-bear{grid-template-columns:1fr;}
+  .bull-box{border-right:none;border-bottom:1px solid var(--border);}
+  .result-header{flex-direction:column;}
+  .rh-right{align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://scansvalue.com" class="nav-logo"><div class="logo-mark"></div>ValueScan</a>
+  <div class="nav-links">
+    <span class="nav-badge">Pro subscriber</span>
+    <a href="https://scansvalue.com">Home</a>
+    <a href="https://scansvalue.com/research">Research</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-eyebrow">Pro tool · Stock scanner</div>
+  <h1 class="page-h1">Is this stock a value?</h1>
+  <p class="page-sub">Enter any US stock ticker. We fetch live fundamentals and run it through all 12 criteria of the value framework — low debt, buybacks, insider ownership, moat, margin of safety, and more.</p>
+
+  <!-- SEARCH -->
+  <div class="search-box">
+    <div class="search-label">Enter a stock ticker to analyse</div>
+    <div class="search-row">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="e.g. AAPL, MSFT, JNJ, KO..."
+        id="ticker-input"
+        maxlength="6"
+        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')"
+        onkeydown="if(event.key==='Enter')runScan()"
+      >
+      <button class="search-btn" id="scan-btn" onclick="runScan()">
+        Scan this stock →
+      </button>
+    </div>
+    <p class="search-note">Works for any US-listed stock. Results use live data from Financial Modeling Prep.</p>
+
+    <div class="quick-label">Quick scan — try these:</div>
+    <div class="quick-tickers">
+      <button class="quick-chip" onclick="quickScan('AAPL')">AAPL</button>
+      <button class="quick-chip" onclick="quickScan('KO')">KO</button>
+      <button class="quick-chip" onclick="quickScan('JNJ')">JNJ</button>
+      <button class="quick-chip" onclick="quickScan('MSFT')">MSFT</button>
+      <button class="quick-chip" onclick="quickScan('WMT')">WMT</button>
+      <button class="quick-chip" onclick="quickScan('XOM')">XOM</button>
+      <button class="quick-chip" onclick="quickScan('BRK.B')">BRK.B</button>
+      <button class="quick-chip" onclick="quickScan('PG')">PG</button>
+      <button class="quick-chip" onclick="quickScan('VZ')">VZ</button>
+      <button class="quick-chip" onclick="quickScan('T')">T</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loading-state">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Analysing <span id="loading-ticker"></span>...</div>
+    <div class="loading-steps">
+      <div class="loading-step" id="ls1">Fetching live fundamentals...</div>
+      <div class="loading-step" id="ls2">Running 12 value criteria...</div>
+      <div class="loading-step" id="ls3">Scoring moat and management quality...</div>
+      <div class="loading-step" id="ls4">Writing research analysis...</div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-state" id="error-state">
+    <div class="error-icon">⚠</div>
+    <div class="error-title" id="error-title">Could not fetch data</div>
+    <div class="error-sub" id="error-sub">Check the ticker is correct and try again.</div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-card" id="result-card">
+
+    <div class="result-header">
+      <div class="rh-left">
+        <div class="result-ticker" id="r-ticker"></div>
+        <div class="result-company" id="r-company"></div>
+        <div class="result-sector" id="r-sector"></div>
+      </div>
+      <div class="rh-right">
+        <div class="verdict-badge" id="r-verdict-badge"></div>
+        <div class="gem-badge" id="r-gem-badge"></div>
+      </div>
+    </div>
+
+    <div class="scores-row">
+      <div class="score-cell">
+        <div class="score-cell-label">Hidden Gem Score</div>
+        <div class="score-cell-val" id="r-gem-score"></div>
+        <div class="score-cell-sub">out of 100</div>
+      </div>
+      <div class="score-cell">
+        <div class="score-cell-label">Buffett Score</div>
+        <div class="score-cell-val" id="r-buffett-score"></div>
+        <div class="score-cell-sub">out of 10</div>
+      </div>
+      <div class="score-cell">
+        <div class="score-cell-label">Margin of safety</div>
+        <div class="score-cell-val" id="r-mos"></div>
+        <div class="score-cell-sub">below 52-week high</div>
+      </div>
+      <div class="score-cell">
+        <div class="score-cell-label">Graham checklist</div>
+        <div class="score-cell-val" id="r-graham"></div>
+        <div class="score-cell-sub">criteria passed</div>
+      </div>
+    </div>
+
+    <div class="criteria-section">
+      <div class="criteria-title">12-point value criteria</div>
+      <div class="criteria-grid" id="r-criteria"></div>
+    </div>
+
+    <div class="writeup-section">
+      <div class="writeup-title">
+        Research write-up
+        <span class="writeup-tag">ValueScan analysis</span>
+      </div>
+      <div class="writeup-body" id="r-writeup"></div>
+    </div>
+
+    <div class="bull-bear">
+      <div class="bull-box">
+        <div class="bb-label">Bull case</div>
+        <div class="bb-text" id="r-bull"></div>
+      </div>
+      <div class="bear-box">
+        <div class="bb-label">Bear case</div>
+        <div class="bb-text" id="r-bear"></div>
+      </div>
+    </div>
+
+    <div class="metrics-section">
+      <div class="metrics-title">Key metrics</div>
+      <div class="metrics-grid" id="r-metrics"></div>
+    </div>
+
+    <div class="verdict-section">
+      <div class="verdict-title">Bottom line</div>
+      <div class="verdict-body" id="r-verdict-text"></div>
+      <div class="risk-flag" id="r-risk"></div>
+    </div>
+
+  </div>
+
+  <div class="disclaimer">
+    This tool is for educational research only and does not constitute personalised financial advice or a recommendation to buy or sell any security. Analysis is generated from live market data and the ValueScan framework. Always conduct your own due diligence before investing. <a href="https://scansvalue.com/disclaimer">Full disclaimer →</a>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────
+const API_URL = 'https://your-api.onrender.com'; // Replace with your Render URL
+const ANTHROPIC_KEY = ''; // Leave blank — API server handles this
+
+// ── QUICK SCAN ──────────────────────────────────────
+function quickScan(ticker) {
+  document.getElementById('ticker-input').value = ticker;
+  runScan();
+}
+
+// ── LOADING ANIMATION ───────────────────────────────
+function showLoading(ticker) {
+  hide('result-card'); hide('error-state');
+  document.getElementById('loading-ticker').textContent = ticker;
+  document.getElementById('loading-state').style.display = 'block';
+  ['ls1','ls2','ls3','ls4'].forEach((id, i) => {
+    document.getElementById(id).classList.remove('visible');
+    setTimeout(() => document.getElementById(id).classList.add('visible'), i * 900);
+  });
+}
+
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function show(id, display='block') { document.getElementById(id).style.display = display; }
+
+// ── MAIN SCAN FUNCTION ──────────────────────────────
+async function runScan() {
+  const ticker = document.getElementById('ticker-input').value.trim().toUpperCase();
+  if (!ticker || ticker.length < 1) {
+    document.getElementById('ticker-input').focus();
+    return;
+  }
+
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+  showLoading(ticker);
+
+  try {
+    // Call our API server which fetches FMP data + generates analysis
+    const res = await fetch(`${API_URL}/api/scan/${ticker}`);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
+    hide('loading-state');
+    renderResult(data);
+
+  } catch(err) {
+    console.error('Scan error:', err);
+    hide('loading-state');
+
+    // If API not set up yet, use demo mode with simulated data
+    if (err.message.includes('Failed to fetch') || err.message.includes('your-api')) {
+      renderDemoResult(ticker);
+    } else {
+      showError(ticker, err.message);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Scan this stock →';
+  }
+}
+
+// ── RENDER RESULT ───────────────────────────────────
+function renderResult(data) {
+  const m = data.metrics || {};
+  const s = data.scores  || {};
+  const a = data.analysis || {};
+
+  // Header
+  document.getElementById('r-ticker').textContent  = data.ticker;
+  document.getElementById('r-company').textContent = m.company || '';
+  document.getElementById('r-sector').textContent  = (m.sector || '') + (m.industry ? ' · ' + m.industry : '');
+
+  // Verdict badge
+  const vBadge = document.getElementById('r-verdict-badge');
+  if (s.passes_all) {
+    vBadge.className = 'verdict-badge verdict-yes';
+    vBadge.textContent = '✓ Passes value criteria';
+  } else if (s.gem_score >= 50) {
+    vBadge.className = 'verdict-badge verdict-watch';
+    vBadge.textContent = '◉ Watch list — some criteria missed';
+  } else {
+    vBadge.className = 'verdict-badge verdict-no';
+    vBadge.textContent = '✗ Does not pass value criteria';
+  }
+
+  // Gem badge
+  document.getElementById('r-gem-badge').textContent = `◆ Gem Score: ${s.gem_score}/100`;
+
+  // Scores
+  const gemColor   = s.gem_score >= 70 ? 'var(--green-pass)' : s.gem_score >= 50 ? 'var(--gold)' : 'var(--red)';
+  const mosColor   = s.mos_pct >= 25 ? 'var(--green-pass)' : s.mos_pct >= 10 ? 'var(--gold)' : 'var(--muted)';
+  const grahamPass = (s.graham_passes || 0);
+
+  document.getElementById('r-gem-score').innerHTML    = `<span style="color:${gemColor}">${s.gem_score}</span>`;
+  document.getElementById('r-buffett-score').innerHTML= `<span style="color:var(--gold)">${(s.buffett_score||0).toFixed(1)}</span>`;
+  document.getElementById('r-mos').innerHTML          = `<span style="color:${mosColor}">${s.mos_pct}%</span>`;
+  document.getElementById('r-graham').innerHTML       = `<span style="color:${grahamPass>=3?'var(--green-pass)':'var(--muted)'}">${grahamPass}/5</span>`;
+
+  // Criteria
+  const criteria = s.criteria || [];
+  document.getElementById('r-criteria').innerHTML = criteria.map(c => `
+    <div class="criterion">
+      <div class="crit-icon ${c.pass ? 'crit-pass' : 'crit-fail'}">${c.pass ? '✓' : '✗'}</div>
+      <span class="crit-label">${c.label}</span>
+      <span class="crit-val">${c.value || ''}</span>
+    </div>
+  `).join('');
+
+  // Write-up
+  document.getElementById('r-writeup').textContent = a.writeup || '';
+  document.getElementById('r-bull').textContent    = a.bull_case || '';
+  document.getElementById('r-bear').textContent    = a.bear_case || '';
+
+  // Metrics
+  const metricDefs = [
+    {label:'P/E ratio',     val: m.pe_ratio   ? m.pe_ratio + 'x'   : '—'},
+    {label:'FCF yield',     val: m.fcf_yield   ? m.fcf_yield + '%'  : '—'},
+    {label:'Debt / equity', val: m.debt_equity ? m.debt_equity + 'x': '—'},
+    {label:'ROE',           val: m.roe         ? m.roe + '%'        : '—'},
+    {label:'Dividend yield',val: m.div_yield   ? m.div_yield + '%'  : '—'},
+    {label:'Market cap',    val: m.market_cap_b? '$' + m.market_cap_b + 'B': '—'},
+    {label:'Insider ownership', val: m.insider_pct ? m.insider_pct + '%' : '—'},
+    {label:'Buybacks',      val: m.buybacks ? 'Active ✓' : 'None ✗'},
+  ];
+  document.getElementById('r-metrics').innerHTML = metricDefs.map(x => `
+    <div class="metric-box">
+      <div class="metric-label">${x.label}</div>
+      <div class="${x.val==='—'?'metric-na':'metric-val'}">${x.val}</div>
+    </div>
+  `).join('');
+
+  // Verdict
+  document.getElementById('r-verdict-text').textContent = a.verdict || '';
+  const riskEl = document.getElementById('r-risk');
+  if (a.risk) {
+    riskEl.textContent = '⚠ Key risk: ' + a.risk;
+    riskEl.style.display = 'block';
+  } else {
+    riskEl.style.display = 'none';
+  }
+
+  show('result-card');
+  document.getElementById('result-card').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── DEMO MODE (when API not set up yet) ─────────────
+function renderDemoResult(ticker) {
+  const demoData = {
+    ticker,
+    metrics: {
+      company: ticker + ' Corporation (Demo — connect API for live data)',
+      sector: 'Demo mode', industry: 'API not yet configured',
+      pe_ratio: 14.2, fcf_yield: 6.8, debt_equity: 0.4,
+      roe: 18.4, div_yield: 2.8, market_cap_b: 42.6,
+      insider_pct: 3.2, buybacks: true,
+    },
+    scores: {
+      gem_score: 72, buffett_score: 7.4, mos_pct: 18.4,
+      graham_passes: 4, passes_all: true,
+      criteria: [
+        {label:'P/E below 20', pass:true,  value:'14.2x'},
+        {label:'Low debt',     pass:true,  value:'0.4x D/E'},
+        {label:'FCF yield > 3%', pass:true, value:'6.8%'},
+        {label:'Insider ownership', pass:true, value:'3.2%'},
+        {label:'Active buybacks', pass:true, value:'Yes'},
+        {label:'Current ratio > 1.2', pass:true, value:'1.8x'},
+        {label:'Market cap < $100B', pass:true, value:'$42.6B'},
+        {label:'ROE > 10%', pass:true, value:'18.4%'},
+        {label:'Revenue not collapsing', pass:true, value:'+4.2%'},
+        {label:'Gross margin > 20%', pass:true, value:'38.4%'},
+        {label:'Margin of safety', pass:true, value:'18% below high'},
+        {label:'Moat present', pass:false, value:'Check manually'},
+      ]
+    },
+    analysis: {
+      writeup: `This is a demo result showing what the scanner produces. To get live analysis for ${ticker}, deploy the API server on Render.com and update the API_URL at the top of this file. Once connected, the scanner fetches real fundamentals from Financial Modeling Prep and generates a full research write-up for any ticker you enter.`,
+      bull_case: 'When connected to the live API, the bull case explains why the current price may undervalue the business based on its competitive position, cash flows, and growth prospects.',
+      bear_case: 'The bear case explains what could go wrong — regulatory risk, competitive threats, leverage concerns, or valuation assumptions that may not hold.',
+      verdict: 'The bottom line summarises whether this stock passes the full value framework and whether it belongs on your watchlist.',
+      risk: 'API not yet connected — deploy api_server.py on Render.com to enable live scanning.',
+    }
+  };
+  renderResult(demoData);
+}
+
+function showError(ticker, message) {
+  document.getElementById('error-title').textContent = `Could not analyse ${ticker}`;
+  document.getElementById('error-sub').textContent = message.includes('404')
+    ? 'Ticker not found. Make sure it is a valid US stock symbol.'
+    : 'Something went wrong. Check your connection and try again.';
+  show('error-state');
+}
+</script>
+</body>
+</html>

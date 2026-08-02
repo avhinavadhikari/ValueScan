@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ValueScan — Daily value stock picks for serious investors</title>
+<meta name="description" content="ValueScan runs the Graham-Buffett-Munger value framework across 50+ US stocks every trading day. We research 50+ US stocks every trading day using the Graham–Buffett–Munger framework and send you the best opportunities with a full write-up.">
+<meta property="og:title" content="ValueScan — Value stock research, daily">
+<meta property="og:description" content="We research 50+ stocks every trading day using the world's best value investing framework and send you the ones worth watching.">
+<meta property="og:url" content="https://scansvalue.com">
+<meta name="twitter:card" content="summary">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --navy:    #0B0F1A;
+    --card:    #111827;
+    --border:  #1E2A3A;
+    --border2: #2A3A50;
+    --text:    #EEF2FF;
+    --muted:   #7A8BA8;
+    --dim:     #3A4A5E;
+    --green:   #B8FF4F;
+    --green2:  #8AE020;
+    --mono:    'JetBrains Mono', monospace;
+    --serif:   'Crimson Pro', Georgia, serif;
+    --sans:    'Inter', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--navy);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Nav ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(11,15,26,.92);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .15s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--green);
+    color: #000;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .nav-cta:hover { background: var(--green2); }
+
+  /* ── Ticker tape ── */
+  .ticker-wrap {
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    padding: 8px 0;
+  }
+  .ticker-track {
+    display: flex;
+    gap: 0;
+    animation: scroll-left 40s linear infinite;
+    white-space: nowrap;
+    width: max-content;
+  }
+  .ticker-track:hover { animation-play-state: paused; }
+  @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .tick-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 28px;
+    font-family: var(--mono);
+    font-size: 12px;
+    border-right: 1px solid var(--border);
+  }
+  .tick-sym { color: var(--text); font-weight: 500; }
+  .tick-company { color: var(--muted); font-size: 11px; }
+  .tick-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--dim); }
+
+  /* ── Hero ── */
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 90px 40px 80px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--green);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero-h1 {
+    font-family: var(--serif);
+    font-size: clamp(42px, 7vw, 72px);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+  .hero-h1 em { font-style: italic; color: var(--green); }
+  .hero-sub {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 580px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+  .hero-form {
+    display: flex;
+    gap: 10px;
+    max-width: 420px;
+    margin: 0 auto 16px;
+  }
+  .hero-input {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: var(--sans);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .hero-input::placeholder { color: var(--muted); }
+  .hero-input:focus { border-color: var(--green); }
+  .hero-btn {
+    background: var(--green);
+    color: #000;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 12px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: var(--sans);
+    transition: background .15s;
+  }
+  .hero-btn:hover { background: var(--green2); }
+  .hero-note { font-size: 12px; color: var(--dim); }
+  .hero-note a { color: var(--muted); }
+
+  /* ── Sample picks strip ── */
+  .picks-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 70px;
+  }
+  .picks-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .picks-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .pick-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color .15s;
+  }
+  .pick-card:hover { border-color: var(--green); }
+  .pick-ticker { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .pick-name { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .pick-locked { font-size: 11px; color: var(--dim); display: flex; align-items: center; gap: 5px; }
+
+  /* ── How it works ── */
+  .how-section {
+    border-top: 1px solid var(--border);
+    padding: 80px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-h2 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: 48px;
+    color: var(--text);
+  }
+  .steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .step { }
+  .step-num { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-bottom: 12px; }
+  .step-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+  .step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* ── Pricing ── */
+  .pricing-section {
+    border-top: 1px solid var(--border);
+    padding: 80px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 48px; }
+  .plan {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    position: relative;
+  }
+  .plan.featured {
+    border-color: var(--green);
+  }
+  .plan-badge {
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green);
+    color: #000;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 12px;
+    border-radius: 0 0 8px 8px;
+    white-space: nowrap;
+  }
+  .plan-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .plan-price { font-family: var(--serif); font-size: 40px; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1; }
+  .plan-price span { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--muted); }
+  .plan-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .plan-features li { font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; line-height: 1.4; }
+  .plan-features li::before { content: '—'; color: var(--dim); flex-shrink: 0; }
+  .plan-features li.included { color: var(--text); }
+  .plan-features li.included::before { content: '✓'; color: var(--green); }
+  .plan-cta {
+    display: block;
+    text-align: center;
+    padding: 11px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all .15s;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+  }
+  .plan-cta:hover { border-color: var(--text); color: var(--text); }
+  .plan-cta.primary { background: var(--green); color: #000; border-color: var(--green); }
+  .plan-cta.primary:hover { background: var(--green2); border-color: var(--green2); }
+
+  /* ── Signup section ── */
+  .signup-section {
+    border-top: 1px solid var(--border);
+    padding: 80px 40px;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .signup-h2 { font-family: var(--serif); font-size: clamp(28px, 4vw, 44px); font-weight: 600; margin-bottom: 14px; color: var(--text); }
+  .signup-sub { font-size: 16px; color: var(--muted); margin-bottom: 32px; }
+  .signup-form { display: flex; flex-direction: column; gap: 12px; max-width: 380px; margin: 0 auto 16px; }
+  .signup-input {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: var(--sans);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .signup-input::placeholder { color: var(--muted); }
+  .signup-input:focus { border-color: var(--green); }
+  .signup-btn {
+    background: var(--green);
+    color: #000;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 13px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: background .15s;
+  }
+  .signup-btn:hover { background: var(--green2); }
+  .signup-legal { font-size: 12px; color: var(--dim); max-width: 340px; margin: 0 auto; line-height: 1.5; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .footer-note { font-size: 12px; color: var(--dim); max-width: 560px; line-height: 1.5; }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { font-size: 12px; color: var(--dim); text-decoration: none; }
+  .footer-links a:hover { color: var(--muted); }
+
+  /* ── Success state ── */
+  .success-msg { display: none; text-align: center; padding: 16px; background: rgba(184,255,79,.08); border: 1px solid rgba(184,255,79,.2); border-radius: 10px; color: var(--green); font-size: 14px; max-width: 380px; margin: 0 auto; }
+
+  @media (max-width: 680px) {
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 60px 20px 50px; }
+    .picks-section, .how-section, .pricing-section, .signup-section { padding-left: 20px; padding-right: 20px; }
+    .picks-grid, .steps, .pricing-grid { grid-template-columns: 1fr; }
+    .hero-form { flex-direction: column; }
+    footer { flex-direction: column; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="https://scansvalue.com" class="nav-logo"><div class="logo-mark"></div>ValueScan</a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#signup">Sign up</a>
+    <a href="#signup" class="nav-cta">Sign up free</a>
+  </div>
+</nav>
+
+<!-- Ticker tape -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tape"></div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-eyebrow">Value investing · daily research · scansvalue.com</div>
+  <h1 class="hero-h1">The market researched.<br><em>Every trading day.</em></h1>
+  <p class="hero-sub">Every evening we apply the Graham–Buffett–Munger value framework to 50+ US stocks. We look for low debt, companies buying back their own shares, and meaningful insider ownership — then send you the ones worth watching with a full write-up and margin of safety.</p>
+  <form class="hero-form" onsubmit="handleHeroSignup(event)">
+    <input type="email" class="hero-input" placeholder="your@email.com" required id="hero-email">
+    <button type="submit" class="hero-btn">Sign up free →</button>
+  </form>
+  <p class="hero-note">No credit card needed. Cancel anytime. <a href="#pricing">See full plans →</a></p>
+</section>
+
+<!-- Sample picks -->
+<section class="picks-section">
+  <div class="picks-label">From today's research — sign up to see the full write-up</div>
+  <div class="picks-grid" id="picks-grid"></div>
+</section>
+
+<!-- How it works -->
+<section class="how-section" id="how">
+  <div class="section-label">How it works</div>
+  <h2 class="section-h2">Six books of wisdom.<br>One daily research process.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">Every trading day after market close</div>
+      <div class="step-title">Research begins</div>
+      <div class="step-desc">We pull the latest fundamentals for 50+ stocks — earnings, cash flow, debt levels, return on equity, insider ownership, and share buyback activity — and check every number against our research criteria.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Graham · Fisher · Greenblatt criteria</div>
+      <div class="step-title">Framework applied</div>
+      <div class="step-desc">Twelve criteria remove anything that does not meet the standard — including low debt, active share buybacks, and meaningful insider ownership. What remains is assessed for competitive moat, margin of safety, and portfolio balance — no two picks from the same industry.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">You get the full write-up</div>
+      <div class="step-title">You get the full write-up</div>
+      <div class="step-desc">Every stock that makes the cut comes with a plain-English write-up: what makes the business defensible, why the current price is interesting, and the one risk to keep an eye on. In your inbox by 5 PM ET.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing-section" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-h2">Start free.<br>Upgrade when it pays for itself.</h2>
+  <div class="pricing-grid">
+    <div class="plan">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0 <span>/month</span></div>
+      <div class="plan-desc">Try it. No card required.</div>
+      <ul class="plan-features">
+        <li class="included">3 researched picks per week</li>
+        <li class="included">Value assessment + moat rating</li>
+        <li class="included">Weekly email</li>
+        <li>Full 20-stock watchlist</li>
+        <li>Research write-up per pick</li>
+        <li>Real-time alerts</li>
+      </ul>
+      <a href="#signup" class="plan-cta">Start free</a>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">Most popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$19 <span>/month</span></div>
+      <div class="plan-desc">Everything you need to act on the scan.</div>
+      <ul class="plan-features">
+        <li class="included">Full 20-stock watchlist every day</li>
+        <li class="included">Full research write-up for every pick</li>
+        <li class="included">Margin of safety assessment</li>
+        <li class="included">Insider ownership + buyback signals</li>
+        <li class="included">Portfolio diversification guide</li>
+        <li class="included">Email + dashboard access</li>
+        <li>Custom portfolio analysis</li>
+      </ul>
+      <a href="#signup" class="plan-cta primary">Get Pro</a>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Investor+</div>
+      <div class="plan-price">$49 <span>/month</span></div>
+      <div class="plan-desc">For serious self-directed investors.</div>
+      <ul class="plan-features">
+        <li class="included">Everything in Pro</li>
+        <li class="included">Custom portfolio analysis</li>
+        <li class="included">Ask our research team — unlimited</li>
+        <li class="included">Same-day opportunity alerts</li>
+        <li class="included">Monthly deep-dive reports</li>
+        <li class="included">Priority support</li>
+      </ul>
+      <a href="#signup" class="plan-cta">Get Investor+</a>
+    </div>
+  </div>
+</section>
+
+<!-- Signup -->
+<section class="signup-section" id="signup">
+  <h2 class="signup-h2">See the research.<br>Free to start.</h2>
+  <p class="signup-sub">Join investors who only buy when the insiders do, the debt is low, and the company is buying back its own shares.</p>
+  <form class="signup-form" onsubmit="handleSignup(event)" id="signup-form">
+    <input type="text" class="signup-input" placeholder="First name" required id="su-name">
+    <input type="email" class="signup-input" placeholder="Email address" required id="su-email">
+    <select class="signup-input" id="su-plan" style="cursor:pointer">
+      <option value="free">Free — $0/month</option>
+      <option value="pro" selected>Pro — $19/month (most popular)</option>
+      <option value="investor">Investor+ — $49/month</option>
+    </select>
+    <button type="submit" class="signup-btn" id="su-btn">Sign up free →</button>
+  </form>
+  <div class="success-msg" id="success-msg">
+    You're on the list. Check your inbox for a confirmation — first research report arrives tonight.
+  </div>
+  <p class="signup-legal">By signing up you agree to receive the ValueScan newsletter. Pro and Investor+ plans are billed monthly via Stripe. Cancel anytime from your account settings.</p>
+  <p class="signup-legal" style="margin-top:10px;padding-top:10px;border-top:1px solid #1E2A3A">ValueScan is not a registered investment adviser. Content is educational and does not constitute personalised financial advice. Investments can lose value. <a href="https://scansvalue.com/disclaimer" style="color:#7A8BA8">Read full disclaimer →</a></p>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p class="footer-note">ValueScan is an educational newsletter and stock screener, not a registered investment adviser. Content is general in nature and does not constitute personalised financial advice or a recommendation to buy or sell any security. Our research may contain errors and should not replace your own independent judgement. The value of investments can go down as well as up — past performance is not a reliable indicator of future results. Always conduct your own due diligence and consult a qualified financial adviser before making any investment decision. <a href="https://scansvalue.com/disclaimer" style="color:#7A8BA8">Full disclaimer →</a></p>
+  <div class="footer-links">
+    <a href="https://scansvalue.com/privacy">Privacy</a>
+    <a href="https://scansvalue.com/terms">Terms</a>
+    <a href="https://scansvalue.com/disclaimer">Disclaimer</a>
+  </div>
+</footer>
+
+<script>
+const companies = [
+  { ticker:'BMY',  name:'Bristol-Myers Squibb' },
+  { ticker:'BTI',  name:'British American Tobacco' },
+  { ticker:'HII',  name:'Huntington Ingalls Industries' },
+  { ticker:'STZ',  name:'Constellation Brands' },
+  { ticker:'FICO', name:'Fair Isaac Corporation' },
+  { ticker:'HOLX', name:'Hologic Inc.' },
+  { ticker:'LULU', name:'Lululemon Athletica' },
+  { ticker:'CPB',  name:"Campbell's Soup" },
+  { ticker:'NVT',  name:'nVent Electric' },
+  { ticker:'EG',   name:'Everest Group' },
+  { ticker:'RPM',  name:'RPM International' },
+  { ticker:'WSO',  name:'Watsco Inc.' },
+];
+
+function buildTape() {
+  const tape = document.getElementById('tape');
+  const doubled = [...companies, ...companies];
+  tape.innerHTML = doubled.map(c => `
+    <span class="tick-item">
+      <span class="tick-sym">${c.ticker}</span>
+      <span class="tick-dot"></span>
+      <span class="tick-company">${c.name}</span>
+    </span>
+  `).join('');
+}
+
+function buildPicks() {
+  const grid = document.getElementById('picks-grid');
+  grid.innerHTML = companies.slice(0, 4).map(c => `
+    <div class="pick-card" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})" style="cursor:pointer">
+      <div class="pick-ticker">${c.ticker}</div>
+      <div class="pick-name">${c.name}</div>
+      <div class="pick-locked">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Sign up free to see the full research
+      </div>
+    </div>
+  `).join('');
+}
+
+function handleHeroSignup(e) {
+  e.preventDefault();
+  const email = document.getElementById('hero-email').value;
+  document.getElementById('su-email').value = email;
+  document.getElementById('signup').scrollIntoView({ behavior: 'smooth' });
+}
+
+function handleSignup(e) {
+  e.preventDefault();
+  const btn = document.getElementById('su-btn');
+  btn.textContent = 'Signing you up...';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('signup-form').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }, 800);
+}
+
+buildTape();
+buildPicks();
+</script>
+</body>
+</html>

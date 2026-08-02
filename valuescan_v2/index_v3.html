@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ValueScan — Value stock research for serious investors</title>
+<meta name="description" content="We hunt the stocks the market is ignoring. Daily research using decades of value investing wisdom — delivered to serious investors who want an edge.">
+<meta property="og:title" content="ValueScan — Where hidden value gets found">
+<meta property="og:url" content="https://scansvalue.com">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --forest:   #1A2E1A;
+  --forest2:  #213521;
+  --forest3:  #243B24;
+  --forest4:  #2C4A2C;
+  --card:     #1E3120;
+  --card2:    #243828;
+  --border:   #2E4A30;
+  --border2:  #3A5C3A;
+  --cream:    #F2ECD8;
+  --cream2:   #E8DFC4;
+  --muted:    #8FA882;
+  --dim:      #4A6B4A;
+  --gold:     #D4A83A;
+  --gold2:    #C49628;
+  --gold-bg:  rgba(212,168,58,.1);
+  --amber:    #E8B84A;
+  --red:      #C45C4A;
+  --serif:    'Crimson Pro', Georgia, serif;
+  --sans:     'Inter', system-ui, sans-serif;
+  --mono:     'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--forest);
+  color: var(--cream);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Subtle top-to-bottom depth */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, #1C321C 0%, #162816 50%, #111E11 100%);
+  z-index: -1;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 44px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: rgba(26,46,26,.95);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 42px;
+  font-weight: 600;
+  color: var(--cream);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  letter-spacing: -.015em;
+  line-height: 1;
+}
+.logo-mark {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+.nav-links { display: flex; align-items: center; gap: 26px; }
+.nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; transition: color .15s; }
+.nav-links a:hover { color: var(--cream); }
+.nav-cta {
+  background: var(--gold);
+  color: #111;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background .15s;
+}
+.nav-cta:hover { background: var(--gold2); }
+
+/* TICKER TAPE */
+.tape-wrap {
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,.15);
+  padding: 8px 0;
+}
+.tape-track {
+  display: flex;
+  animation: scroll-left 55s linear infinite;
+  white-space: nowrap;
+  width: max-content;
+}
+.tape-track:hover { animation-play-state: paused; }
+@keyframes scroll-left { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.tape-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  border-right: 1px solid var(--border);
+}
+.tape-sym { color: var(--cream); font-weight: 500; }
+.tape-co  { color: var(--muted); }
+.tape-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--dim); }
+
+/* HERO */
+.hero {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 96px 44px 76px;
+  text-align: center;
+}
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hero-h1 {
+  font-family: var(--serif);
+  font-size: clamp(42px, 6.5vw, 72px);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -.02em;
+  color: var(--cream);
+  margin-bottom: 22px;
+}
+.hero-h1 em { font-style: italic; color: var(--gold); }
+.hero-sub {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 560px;
+  margin: 0 auto 38px;
+  line-height: 1.7;
+}
+.hero-form {
+  display: flex;
+  gap: 10px;
+  max-width: 420px;
+  margin: 0 auto 14px;
+}
+.hero-input {
+  flex: 1;
+  background: rgba(0,0,0,.25);
+  border: 1px solid var(--border2);
+  color: var(--cream);
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .15s;
+  font-family: var(--sans);
+}
+.hero-input::placeholder { color: var(--dim); }
+.hero-input:focus { border-color: var(--gold); }
+.hero-btn {
+  background: var(--gold);
+  color: #111;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 13px 22px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s;
+  font-family: var(--sans);
+}
+.hero-btn:hover { background: var(--gold2); }
+.hero-note { font-size: 12px; color: var(--dim); }
+
+/* DIVIDER */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+/* SECTION WRAPPER */
+.section { max-width: 1060px; margin: 0 auto; padding: 64px 44px; }
+.section.narrow { max-width: 900px; }
+
+.section-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.section-h2 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 36px;
+  color: var(--cream);
+}
+
+/* INSTANT PICKS */
+.instant-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.instant-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.instant-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.instant-card:hover { border-color: var(--gold); background: var(--card2); }
+.ic-sym {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--cream);
+  margin-bottom: 3px;
+}
+.ic-name { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.ic-gem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: var(--gold-bg);
+  color: var(--gold);
+  border: 1px solid rgba(212,168,58,.25);
+}
+.ic-scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.ic-score-item {
+  background: rgba(0,0,0,.2);
+  border-radius: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+}
+.ic-score-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+.ic-score-val { font-size: 13px; font-weight: 500; color: var(--cream); }
+.ic-locked {
+  font-size: 11px;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-top: 1px solid var(--border);
+  padding-top: 9px;
+}
+.signup-cta {
+  display: block;
+  text-align: center;
+  background: var(--gold-bg);
+  border: 1px solid rgba(212,168,58,.3);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .15s;
+}
+.signup-cta:hover { background: rgba(212,168,58,.15); }
+
+/* HIDDEN GEMS */
+.gems-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.gem-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  transition: border-color .15s;
+}
+.gem-card:hover { border-color: var(--border2); }
+.gem-card.locked { position: relative; overflow: hidden; }
+.gem-card.locked::after {
+  content: 'Sign up to reveal';
+  position: absolute;
+  inset: 0;
+  background: rgba(26,46,26,.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+  border-radius: 10px;
+  backdrop-filter: blur(2px);
+}
+.gem-ticker { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 2px; }
+.gem-name { font-size: 11px; color: var(--muted); margin-bottom: 9px; }
+.gem-score-row { display: flex; align-items: center; gap: 6px; }
+.gem-score-label { font-size: 10px; color: var(--muted); }
+.gem-bar-bg { flex: 1; height: 3px; border-radius: 2px; background: var(--border2); }
+.gem-bar { height: 3px; border-radius: 2px; background: var(--gold); }
+.gem-score-num { font-family: var(--mono); font-size: 11px; color: var(--gold); width: 26px; text-align: right; }
+.gem-sector { font-size: 10px; color: var(--dim); margin-top: 6px; }
+
+/* HOW IT WORKS */
+.steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+.step-num-label { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-bottom: 10px; }
+.step-title { font-size: 15px; font-weight: 500; color: var(--cream); margin-bottom: 6px; }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+/* WISDOM */
+.wisdom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.wisdom-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+  padding: 16px 18px;
+}
+.wisdom-source { font-family: var(--mono); font-size: 10px; color: var(--gold); margin-bottom: 7px; letter-spacing: .04em; }
+.wisdom-quote {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--cream);
+  line-height: 1.55;
+  margin-bottom: 7px;
+}
+.wisdom-apply { font-size: 11px; color: var(--muted); line-height: 1.55; }
+
+/* CONTENT HUB */
+.posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.post-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .15s;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+}
+.post-card:hover { border-color: var(--border2); }
+.post-tag { font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 14px 14px 0; display: block; }
+.tag-deep  { color: var(--gold); }
+.tag-gem   { color: var(--amber); }
+.tag-sector{ color: #7EB8FF; }
+.tag-edu   { color: #C07EFF; }
+.post-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 8px 14px;
+  line-height: 1.3;
+  color: var(--cream);
+  flex: 1;
+}
+.post-excerpt { font-size: 12px; color: var(--muted); padding: 0 14px 10px; line-height: 1.6; }
+.post-footer { display: flex; justify-content: space-between; padding: 8px 14px 14px; border-top: 1px solid var(--border); margin-top: auto; }
+.post-date  { font-size: 10px; color: var(--dim); font-family: var(--mono); }
+.post-read  { font-size: 10px; color: var(--muted); }
+.content-more { text-align: center; margin-top: 18px; }
+.content-more a { font-size: 13px; color: var(--muted); text-decoration: none; }
+.content-more a:hover { color: var(--cream); }
+
+/* SIMULATOR */
+.sim-container {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.sim-container::after {
+  content: 'Unlock with Pro — sign up free to start';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 55%;
+  background: linear-gradient(to bottom, rgba(30,49,32,0) 0%, rgba(26,46,26,.97) 55%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 24px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+  cursor: pointer;
+}
+.sim-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.sim-title { font-family: var(--mono); font-size: 12px; color: var(--gold); }
+.sim-legend { display: flex; gap: 14px; }
+.sim-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.sim-leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+.sim-chart { display: flex; align-items: flex-end; gap: 6px; height: 110px; margin-bottom: 8px; }
+.sim-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; justify-content: flex-end; }
+.sim-bar { width: 100%; border-radius: 3px 3px 0 0; }
+.sim-bar2 { width: 65%; border-radius: 3px 3px 0 0; }
+.sim-yr { font-size: 9px; color: var(--dim); font-family: var(--mono); margin-top: 5px; }
+.sim-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+.sim-stat { background: rgba(0,0,0,.2); border-radius: 8px; padding: 10px 12px; border: 1px solid var(--border); }
+.sim-stat-label { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+.sim-stat-val { font-size: 16px; font-weight: 500; }
+
+/* PRICING */
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 38px; }
+.plan {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 26px 22px;
+  position: relative;
+}
+.plan.featured { border-color: var(--gold); }
+.plan-badge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: #111;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 12px;
+  border-radius: 0 0 8px 8px;
+  white-space: nowrap;
+}
+.plan-name { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.plan-price { font-family: var(--serif); font-size: 38px; font-weight: 600; line-height: 1; margin-bottom: 4px; color: var(--cream); }
+.plan-price span { font-family: var(--sans); font-size: 13px; font-weight: 400; color: var(--muted); }
+.plan-desc { font-size: 12px; color: var(--muted); margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 22px; }
+.plan-features li { font-size: 12px; display: flex; gap: 7px; line-height: 1.4; }
+.plan-features li.on { color: var(--cream); }
+.plan-features li.on::before { content: '✓'; color: var(--gold); flex-shrink: 0; }
+.plan-features li.off { color: var(--dim); }
+.plan-features li.off::before { content: '—'; flex-shrink: 0; }
+.plan-cta {
+  display: block;
+  text-align: center;
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  transition: all .15s;
+  cursor: pointer;
+}
+.plan-cta:hover { border-color: var(--cream); color: var(--cream); }
+.plan-cta.primary { background: var(--gold); color: #111; border-color: var(--gold); }
+.plan-cta.primary:hover { background: var(--gold2); }
+
+/* PROCESS */
+.process-steps { display: flex; flex-direction: column; }
+.process-step { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+.process-step:last-child { border-bottom: none; }
+.ps-num {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--gold-bg);
+  border: 1px solid rgba(212,168,58,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.ps-title { font-size: 13px; font-weight: 500; color: var(--cream); margin-bottom: 4px; }
+.ps-desc { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.ps-time { font-size: 10px; color: var(--dim); margin-top: 5px; font-family: var(--mono); }
+
+/* SIGNUP */
+.signup-section {
+  border-top: 1px solid var(--border);
+  padding: 72px 44px;
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto;
+}
+.signup-h2 { font-family: var(--serif); font-size: clamp(28px, 4vw, 46px); font-weight: 600; margin-bottom: 12px; color: var(--cream); }
+.signup-sub { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
+.signup-form { display: flex; flex-direction: column; gap: 10px; max-width: 360px; margin: 0 auto 14px; }
+.signup-input {
+  background: rgba(0,0,0,.25);
+  border: 1px solid var(--border2);
+  color: var(--cream);
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .15s;
+  font-family: var(--sans);
+}
+.signup-input::placeholder { color: var(--dim); }
+.signup-input:focus { border-color: var(--gold); }
+.signup-input option { background: var(--card); color: var(--cream); }
+.signup-btn {
+  background: var(--gold);
+  color: #111;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 13px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: background .15s;
+}
+.signup-btn:hover { background: var(--gold2); }
+.signup-legal { font-size: 11px; color: var(--dim); max-width: 340px; margin: 10px auto 0; line-height: 1.55; }
+.signup-legal a { color: var(--muted); }
+.success-msg {
+  display: none;
+  text-align: center;
+  padding: 16px;
+  background: var(--gold-bg);
+  border: 1px solid rgba(212,168,58,.25);
+  border-radius: 10px;
+  color: var(--gold);
+  font-size: 14px;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 44px;
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.footer-note { font-size: 11px; color: var(--dim); max-width: 520px; line-height: 1.6; }
+.footer-links { display: flex; gap: 18px; flex-shrink: 0; }
+.footer-links a { font-size: 11px; color: var(--dim); text-decoration: none; }
+.footer-links a:hover { color: var(--muted); }
+
+@media(max-width:700px){
+  nav{padding:14px 20px;}
+  .nav-links{display:none;}
+  .hero,.section,.signup-section{padding-left:20px;padding-right:20px;}
+  .instant-grid,.gems-grid,.steps,.wisdom-grid,.posts-grid,.pricing-grid,.sim-stats{grid-template-columns:1fr;}
+  .hero-form{flex-direction:column;}
+  footer{flex-direction:column;padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://scansvalue.com" class="nav-logo"><div class="logo-mark"></div>ValueScan</a>
+  <div class="nav-links">
+    <a href="#research">Free research</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#signup" class="nav-cta">Sign up free</a>
+  </div>
+</nav>
+
+<div class="tape-wrap"><div class="tape-track" id="tape"></div></div>
+
+<section class="hero">
+  <div class="hero-eyebrow">Daily value research · scansvalue.com</div>
+  <h1 class="hero-h1">We hunt the stocks<br>the market <em>is ignoring.</em></h1>
+  <p class="hero-sub">Decades of value investing wisdom — distilled into a daily research process that finds undervalued businesses before the crowd notices. Low debt. Insider buying. Share buybacks. Hidden Gem Score.</p>
+  <form class="hero-form" onsubmit="handleHeroSignup(event)">
+    <input type="email" class="hero-input" placeholder="your@email.com" required id="hero-email">
+    <button type="submit" class="hero-btn">Sign up free →</button>
+  </form>
+  <p class="hero-note">3 full research reports the moment you sign up. No credit card needed.</p>
+</section>
+
+<hr class="section-divider">
+
+<!-- INSTANT PICKS -->
+<div class="section">
+  <div class="instant-label">What lands in your inbox within 2 minutes of signing up</div>
+  <div id="scan-date" style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:12px"></div>
+  <div class="instant-grid" id="instant-grid"></div>
+  <a href="#signup" class="signup-cta" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'});return false;">
+    Sign up free to read the full analysis on all three →
+  </a>
+</div>
+
+<hr class="section-divider">
+
+<!-- HIDDEN GEMS -->
+<div class="section" id="gems">
+  <div class="section-eyebrow">Hidden Gem Score™</div>
+  <h2 class="section-h2">Small companies. Strong fundamentals.<br>Market not paying attention.</h2>
+  <div class="gems-grid" id="gems-grid"></div>
+</div>
+
+<hr class="section-divider">
+
+<!-- HOW IT WORKS -->
+<div class="section narrow" id="how">
+  <div class="section-eyebrow">How it works</div>
+  <h2 class="section-h2">Decades of wisdom.<br>Scanned daily.<br>In your inbox by 5 PM.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num-label">Every trading day after market close</div>
+      <div class="step-title">Research begins</div>
+      <div class="step-desc">We pull the latest fundamentals — earnings, cash flow, debt, insider ownership, buyback activity — and run every number through our 12-point criteria.</div>
+    </div>
+    <div class="step">
+      <div class="step-num-label">12 criteria. No exceptions.</div>
+      <div class="step-title">The framework applied</div>
+      <div class="step-desc">Low debt. Active buybacks. Insider ownership. Durable moat. Price below intrinsic value. Only stocks that pass every test make the list — no two from the same industry.</div>
+    </div>
+    <div class="step">
+      <div class="step-num-label">In your inbox by 5 PM ET</div>
+      <div class="step-title">You get the full write-up</div>
+      <div class="step-desc">Every qualifying stock gets a full report: the bull case, the bear case, the Hidden Gem Score, the Buffett Score, and the one risk to watch. Plain language, no jargon.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- WISDOM -->
+<div class="section narrow">
+  <div class="section-eyebrow">The knowledge base</div>
+  <h2 class="section-h2">Every great investor left a playbook.<br>We run them all, every day.</h2>
+  <div class="wisdom-grid">
+    <div class="wisdom-card">
+      <div class="wisdom-source">Benjamin Graham · The Intelligent Investor</div>
+      <div class="wisdom-quote">"The margin of safety is the central concept of investment."</div>
+      <div class="wisdom-apply">Applied: every stock must trade below our intrinsic value estimate before it makes the list.</div>
+    </div>
+    <div class="wisdom-card">
+      <div class="wisdom-source">Warren Buffett · Berkshire Annual Letters</div>
+      <div class="wisdom-quote">"A wonderful company at a fair price beats a fair company at a wonderful price."</div>
+      <div class="wisdom-apply">Applied: our Buffett Score rates moat quality, management, predictability, and capital allocation.</div>
+    </div>
+    <div class="wisdom-card">
+      <div class="wisdom-source">Peter Lynch · One Up On Wall Street</div>
+      <div class="wisdom-quote">"The person that turns over the most rocks wins the game."</div>
+      <div class="wisdom-apply">Applied: our Hidden Gems list targets small and mid-caps most institutions never bother to analyse.</div>
+    </div>
+    <div class="wisdom-card">
+      <div class="wisdom-source">Charlie Munger · Poor Charlie's Almanack</div>
+      <div class="wisdom-quote">"Invert, always invert."</div>
+      <div class="wisdom-apply">Applied: every report includes a bear case — we argue the opposite before we make the case for value.</div>
+    </div>
+    <div class="wisdom-card">
+      <div class="wisdom-source">Seth Klarman · Margin of Safety</div>
+      <div class="wisdom-quote">"Value investing is the marriage of a contrarian streak and a calculator."</div>
+      <div class="wisdom-apply">Applied: we look hardest at hated sectors where fear has created opportunity most analysts avoid.</div>
+    </div>
+    <div class="wisdom-card">
+      <div class="wisdom-source">Joel Greenblatt · The Little Book That Beats the Market</div>
+      <div class="wisdom-quote">"Figure out the value of something and then pay a lot less."</div>
+      <div class="wisdom-apply">Applied: return on capital and earnings yield are the two primary lenses in our scoring model.</div>
+    </div>
+    <div class="wisdom-card">
+      <div class="wisdom-source">Philip Fisher · Common Stocks and Uncommon Profits</div>
+      <div class="wisdom-quote">"The best time to sell a stock is almost never."</div>
+      <div class="wisdom-apply">Applied: we screen for businesses that can compound for a decade, not just outperform next quarter.</div>
+    </div>
+    <div class="wisdom-card">
+      <div class="wisdom-source">Mohnish Pabrai · The Dhandho Investor</div>
+      <div class="wisdom-quote">"Heads I win, tails I don't lose much."</div>
+      <div class="wisdom-apply">Applied: our Buy Zone alert fires only when risk/reward is genuinely asymmetric in the investor's favour.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- FREE CONTENT -->
+<div class="section" id="research">
+  <div class="section-eyebrow">Free research · Published every Tuesday and Thursday</div>
+  <h2 class="section-h2">Read. Learn. Invest better.</h2>
+  <div class="posts-grid" id="posts-grid"></div>
+  <div class="content-more"><a href="https://scansvalue.com/research">Read all research →</a></div>
+</div>
+
+<hr class="section-divider">
+
+<!-- SIMULATOR -->
+<div class="section narrow">
+  <div class="section-eyebrow">Pro feature — Portfolio simulator</div>
+  <h2 class="section-h2">Build your value portfolio.<br>See how it would have performed.</h2>
+  <div class="sim-container" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">
+    <div class="sim-header">
+      <span class="sim-title">ValueScan portfolio vs S&amp;P 500 — 2019–2025</span>
+      <div class="sim-legend">
+        <div class="sim-leg-item"><div class="sim-leg-dot" style="background:var(--gold)"></div>ValueScan</div>
+        <div class="sim-leg-item"><div class="sim-leg-dot" style="background:var(--dim)"></div>S&amp;P 500</div>
+      </div>
+    </div>
+    <div class="sim-chart" id="sim-chart"></div>
+    <div class="sim-stats">
+      <div class="sim-stat"><div class="sim-stat-label">Simulated annual return</div><div class="sim-stat-val" style="color:var(--gold)">14.2%</div></div>
+      <div class="sim-stat"><div class="sim-stat-label">vs S&amp;P 500</div><div class="sim-stat-val" style="color:var(--amber)">+4.1%</div></div>
+      <div class="sim-stat"><div class="sim-stat-label">Worst drawdown</div><div class="sim-stat-val" style="color:var(--red)">-18%</div></div>
+      <div class="sim-stat"><div class="sim-stat-label">Diversification score</div><div class="sim-stat-val" style="color:var(--cream)">9/10</div></div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- PRICING -->
+<div class="section narrow" id="pricing">
+  <div class="section-eyebrow">Pricing</div>
+  <h2 class="section-h2">Start free. Upgrade when it pays for itself.</h2>
+  <div class="pricing-grid">
+    <div class="plan">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0 <span>/month</span></div>
+      <div class="plan-desc">3 full research reports the moment you sign up.</div>
+      <ul class="plan-features">
+        <li class="on">3 researched picks per week</li>
+        <li class="on">Full write-up for each pick</li>
+        <li class="on">Bull case + bear case</li>
+        <li class="on">Hidden Gem Score</li>
+        <li class="on">Free research articles (2x/week)</li>
+        <li class="off">Full 20-stock daily watchlist</li>
+        <li class="off">Portfolio simulator</li>
+        <li class="off">Buy Zone alerts</li>
+      </ul>
+      <a href="#signup" class="plan-cta" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'});return false;">Sign up free</a>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">Most popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$19 <span>/month</span></div>
+      <div class="plan-desc">Full daily watchlist and every research tool.</div>
+      <ul class="plan-features">
+        <li class="on">Full 20-stock watchlist daily</li>
+        <li class="on">Buffett Score + Graham Score per stock</li>
+        <li class="on">Hidden Gem Score + small cap list</li>
+        <li class="on">Buy Zone alerts — real time</li>
+        <li class="on">Portfolio diversification guide</li>
+        <li class="on">Management quality analysis</li>
+        <li class="on">Portfolio simulator</li>
+        <li class="on">Dashboard access</li>
+      </ul>
+      <a href="#signup" class="plan-cta primary" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'});return false;">Sign up free →</a>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Investor+</div>
+      <div class="plan-price">$49 <span>/month</span></div>
+      <div class="plan-desc">For serious self-directed investors who want everything.</div>
+      <ul class="plan-features">
+        <li class="on">Everything in Pro</li>
+        <li class="on">Custom portfolio analysis</li>
+        <li class="on">Ask our research team — unlimited</li>
+        <li class="on">Same-day opportunity alerts</li>
+        <li class="on">Monthly deep-dive reports</li>
+        <li class="on">Historical performance by strategy</li>
+        <li class="on">Global stocks — coming soon</li>
+        <li class="on">Priority support</li>
+      </ul>
+      <a href="#signup" class="plan-cta" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'});return false;">Get Investor+</a>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- EMAIL PROCESS -->
+<div class="section narrow">
+  <div class="section-eyebrow">What happens after you sign up</div>
+  <h2 class="section-h2" style="font-size:clamp(22px,3vw,32px);margin-bottom:22px">Your research arrives in 3 steps</h2>
+  <div class="process-steps">
+    <div class="process-step">
+      <div class="ps-num">1</div>
+      <div>
+        <div class="ps-title">3 reports land in your inbox within 2 minutes</div>
+        <div class="ps-desc">The moment you confirm your email, we send you the 3 highest-scoring stocks from today's research — full write-up, bull case, bear case, Hidden Gem Score, and the one risk to watch.</div>
+        <div class="ps-time">→ Delivery within 2 minutes of email confirmation</div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="ps-num">2</div>
+      <div>
+        <div class="ps-title">Every trading day at 5 PM ET — your daily report</div>
+        <div class="ps-desc">After each market close our research runs. Any stock that passes all 12 criteria gets a full write-up. Pro subscribers get the full list of 20. Free subscribers get the top 3. In your inbox before dinner.</div>
+        <div class="ps-time">→ Monday to Friday, 5 PM ET</div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="ps-num">3</div>
+      <div>
+        <div class="ps-title">Twice a week — free research articles on the website</div>
+        <div class="ps-desc">Every Tuesday and Thursday we publish a deeper piece on our research page — a sector breakdown, a company deep dive, or a value investing concept explained. Free to read, no signup needed. Content stays live so you can read back through months of research.</div>
+        <div class="ps-time">→ Published every Tuesday and Thursday</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- SIGNUP -->
+<section class="signup-section" id="signup">
+  <h2 class="signup-h2">3 research reports.<br>Free. Right now.</h2>
+  <p class="signup-sub">Sign up and get the top 3 value picks from today's research in your inbox within 2 minutes.</p>
+  <form class="signup-form" onsubmit="handleSignup(event)" id="signup-form">
+    <input type="text" class="signup-input" placeholder="First name" required id="su-name">
+    <input type="email" class="signup-input" placeholder="Email address" required id="su-email">
+    <select class="signup-input" id="su-plan">
+      <option value="free">Free — $0/month (3 picks/week)</option>
+      <option value="pro" selected>Pro — $19/month (full daily watchlist)</option>
+      <option value="investor">Investor+ — $49/month (everything)</option>
+    </select>
+    <button type="submit" class="signup-btn" id="su-btn">Sign up free — get 3 reports now →</button>
+  </form>
+  <div class="success-msg" id="success-msg">Check your inbox — your 3 research reports are on their way. Usually arrives within 2 minutes.</div>
+  <p class="signup-legal">No credit card needed for free plan. Pro and Investor+ billed monthly via Stripe. Cancel anytime. Not investment advice. <a href="https://scansvalue.com/disclaimer">Full disclaimer →</a></p>
+  <p class="signup-legal" style="margin-top:8px">ValueScan is an independent research service and is not affiliated with, endorsed by, or connected to any of the investors or authors referenced on this site.</p>
+</section>
+
+<footer>
+  <p class="footer-note">ValueScan is an educational research service, not a registered investment adviser. Research does not constitute personalised financial advice. The value of investments can go down as well as up. Always conduct your own due diligence. © 2026 ValueScan / scansvalue.com</p>
+  <div class="footer-links">
+    <a href="https://scansvalue.com/research">Research</a>
+    <a href="https://scansvalue.com/disclaimer">Disclaimer</a>
+    <a href="https://scansvalue.com/privacy">Privacy</a>
+    <a href="https://scansvalue.com/terms">Terms</a>
+  </div>
+</footer>
+
+<script>
+const tapeCompanies = [
+  {sym:'BMY',co:'Bristol-Myers Squibb'},{sym:'BTI',co:'British American Tobacco'},
+  {sym:'HII',co:'Huntington Ingalls Industries'},{sym:'STZ',co:'Constellation Brands'},
+  {sym:'FICO',co:'Fair Isaac Corporation'},{sym:'HOLX',co:'Hologic Inc.'},
+  {sym:'LULU',co:'Lululemon Athletica'},{sym:'CPB',co:"Campbell's Soup"},
+  {sym:'NVT',co:'nVent Electric'},{sym:'EG',co:'Everest Group'},
+  {sym:'RPM',co:'RPM International'},{sym:'WSO',co:'Watsco Inc.'},
+  {sym:'AME',co:'AMETEK Inc.'},{sym:'WTW',co:'Willis Towers Watson'},
+];
+
+const instantPicks = [
+  {sym:'BMY',name:'Bristol-Myers Squibb',gem:91,buffett:{moat:8,valuation:9},graham:{stable:true,value:true,sheet:true}},
+  {sym:'HII',name:'Huntington Ingalls Industries',gem:87,buffett:{moat:9,valuation:8},graham:{stable:true,value:true,sheet:true}},
+  {sym:'STZ',name:'Constellation Brands',gem:83,buffett:{moat:8,valuation:9},graham:{stable:true,value:true,sheet:true}},
+];
+
+const gems = [
+  {sym:'TECH',name:'Bio-Techne',score:88,sector:'Life Science Tools'},
+  {sym:'NVT', name:'nVent Electric',score:82,sector:'Electrical Equipment'},
+  {sym:'EG',  name:'Everest Group',score:79,sector:'Specialty Reinsurance'},
+  {sym:'RPM', name:'RPM International',score:76,sector:'Specialty Coatings'},
+  {sym:'BWA', name:'BorgWarner',score:74,sector:'Auto Components',locked:true},
+  {sym:'IRT', name:'Independence Realty',score:71,sector:'Sunbelt REIT',locked:true},
+  {sym:'CPB', name:"Campbell's Soup",score:68,sector:'Consumer Staples',locked:true},
+  {sym:'WSO', name:'Watsco Inc.',score:65,sector:'HVAC Distribution',locked:true},
+];
+
+const posts = [
+  {tag:'Deep Value',tagClass:'tag-deep',title:'Is BMY the most mispriced pharma stock of 2026?',excerpt:'The patent cliff fear is real. But the market appears to be pricing in an outcome far worse than the fundamentals support.',date:'Jul 28, 2026',read:'8 min'},
+  {tag:'Hidden Gem',tagClass:'tag-gem',title:'Bio-Techne: the research tools company customers cannot leave',excerpt:'Scientists cannot switch suppliers mid-experiment. This creates one of the most durable moats in healthcare.',date:'Jul 24, 2026',read:'6 min'},
+  {tag:'Sector Analysis',tagClass:'tag-sector',title:'Defense stocks in 2026: which ones pass the value test',excerpt:'We ran our 12-point framework across the defense sector. Only two names made the cut.',date:'Jul 21, 2026',read:'7 min'},
+];
+
+const simYears = ['2019','2020','2021','2022','2023','2024','2025'];
+const simVS  = [18,-8,32,-12,24,16,14];
+const simSP  = [12,-18,28,-18,24,10,10];
+
+function buildTape(){
+  const t=document.getElementById('tape');
+  const d=[...tapeCompanies,...tapeCompanies];
+  t.innerHTML=d.map(c=>`<span class="tape-item"><span class="tape-sym">${c.sym}</span><span class="tape-dot"></span><span class="tape-co">${c.co}</span></span>`).join('');
+}
+
+function buildInstant(){
+  document.getElementById('instant-grid').innerHTML=instantPicks.map(p=>`
+    <div class="instant-card" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">
+      <div class="ic-sym">${p.sym}</div>
+      <div class="ic-name">${p.name}</div>
+      <div class="ic-gem">◆ Hidden Gem Score: ${p.gem}/100</div>
+      <div class="ic-scores">
+        <div class="ic-score-item"><div class="ic-score-label">Buffett — Moat</div><div class="ic-score-val">${p.buffett.moat}/10</div></div>
+        <div class="ic-score-item"><div class="ic-score-label">Buffett — Valuation</div><div class="ic-score-val">${p.buffett.valuation}/10</div></div>
+        <div class="ic-score-item"><div class="ic-score-label">Graham — Below IV</div><div class="ic-score-val">${p.graham.value?'✓ Pass':'✗ Fail'}</div></div>
+        <div class="ic-score-item"><div class="ic-score-label">Graham — Balance Sheet</div><div class="ic-score-val">${p.graham.sheet?'✓ Pass':'✗ Fail'}</div></div>
+      </div>
+      <div class="ic-locked">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Sign up free to read the full write-up
+      </div>
+    </div>`).join('');
+}
+
+function buildGems(){
+  document.getElementById('gems-grid').innerHTML=gems.map(g=>`
+    <div class="gem-card${g.locked?' locked':''}">
+      <div class="gem-ticker">${g.sym}</div>
+      <div class="gem-name">${g.name}</div>
+      <div class="gem-score-row">
+        <span class="gem-score-label">Gem score</span>
+        <div class="gem-bar-bg"><div class="gem-bar" style="width:${g.score}%"></div></div>
+        <span class="gem-score-num">${g.score}</span>
+      </div>
+      <div class="gem-sector">${g.sector}</div>
+    </div>`).join('');
+}
+
+function buildPosts(){
+  document.getElementById('posts-grid').innerHTML=posts.map(p=>`
+    <a href="#signup" class="post-card" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'});return false;">
+      <span class="post-tag ${p.tagClass}">${p.tag}</span>
+      <div class="post-title">${p.title}</div>
+      <div class="post-excerpt">${p.excerpt}</div>
+      <div class="post-footer"><span class="post-date">${p.date}</span><span class="post-read">${p.read} read</span></div>
+    </a>`).join('');
+}
+
+function buildSim(){
+  const maxV=Math.max(...simVS.map(Math.abs),...simSP.map(Math.abs));
+  const h=100;
+  document.getElementById('sim-chart').innerHTML=simYears.map((_,i)=>`
+    <div class="sim-col">
+      <div class="sim-bar" style="height:${Math.abs(simVS[i])/maxV*h}px;background:${simVS[i]>=0?'var(--gold)':'var(--red)'}"></div>
+      <div class="sim-bar2" style="height:${Math.abs(simSP[i])/maxV*h*0.75}px;background:${simSP[i]>=0?'var(--dim)':'#7a3030'}"></div>
+      <span class="sim-yr">${simYears[i]}</span>
+    </div>`).join('');
+}
+
+function handleHeroSignup(e){
+  e.preventDefault();
+  document.getElementById('su-email').value=document.getElementById('hero-email').value;
+  document.getElementById('signup').scrollIntoView({behavior:'smooth'});
+}
+
+function handleSignup(e){
+  e.preventDefault();
+  const btn=document.getElementById('su-btn');
+  btn.textContent='Sending your reports...';
+  btn.disabled=true;
+  setTimeout(()=>{
+    document.getElementById('signup-form').style.display='none';
+    document.getElementById('success-msg').style.display='block';
+  },900);
+}
+
+buildTape();buildInstant();buildGems();buildPosts();buildSim();
+</script>
+</body>
+</html>
